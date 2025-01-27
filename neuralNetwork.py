@@ -15,7 +15,8 @@ df2 = pd.read_csv("summerOly_hosts.csv")
 
 #list = ["Rank", "NOC", "Gold", "Silver", "Bronze", "Total", "Year"]
 df_merged = df.merge(df2, on="Year", how='outer')
-#print(df_merged)
+df_merged = df_merged.dropna()
+print(df_merged)
 
 encoder = OneHotEncoder(handle_unknown='ignore')
 scaler = MinMaxScaler()
@@ -24,8 +25,8 @@ categorical_features = encoder.fit_transform(df_merged[['Host', 'NOC']]).toarray
 X = np.hstack((df_merged[['Year']].values, categorical_features))
 #X[:, 0] = scaler.fit_transform(X[:, 0].reshape(-1, 1)).flatten()
 y = df_merged[['Gold', 'Silver', 'Bronze', 'Total']].values
-#print(X.shape)
-#print(y.shape)
+print(np.isnan(X).any())
+print(np.isnan(y).any())
 
 
 model = Sequential()
@@ -53,6 +54,17 @@ test_data = scaler.transform(test_data)
 test_categorical = encoder.transform([['Los Angeles, United States', 'United States']]).toarray()
 test_input = np.hstack((test_data, test_categorical))
 
+prediction = model.predict(test_input)
+print(f"Predicted medal counts: {prediction[0]}")
+
+test_categorical = encoder.transform([['Los Angeles, United States', 'China']]).toarray()
+test_input = np.hstack((test_data, test_categorical))
+
+prediction = model.predict(test_input)
+print(f"Predicted medal counts: {prediction[0]}")
+
+test_categorical = encoder.transform([['Los Angeles, United States', 'Japan']]).toarray()
+test_input = np.hstack((test_data, test_categorical))
 
 prediction = model.predict(test_input)
 print(f"Predicted medal counts: {prediction[0]}")
