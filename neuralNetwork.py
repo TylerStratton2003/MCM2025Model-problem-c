@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 import tensorflow as tf
 import tensorflow
+import csv
 
 from tensorflow.python.keras.layers import Input, Dense
 from tensorflow.python.keras.models import Sequential
@@ -87,10 +88,15 @@ countries_2024 = [
     "Venezuela", "Vietnam", "Virgin Islands", "Yemen", "Zambia", "Zimbabwe"
 ]
 
+results_file = open('results_file.csv', 'w')
+header = ['NOC', 'Gold', 'Silver', 'Bronze', 'Total']
+writer = csv.DictWriter(results_file, fieldnames = header)
+writer.writeheader()
 for i in countries_2024:
     test_categorical = encoder.transform([['Los Angeles, United States', i]]).toarray()
     test_input = np.hstack((test_data, test_categorical))
     prediction = model.predict(test_input)
     print(f"Predicted medal counts for {i}: {prediction[0]}")
+    writer.writerow({'NOC' : i, 'Gold' : prediction[0][0], 'Silver' : prediction[0][1], 'Bronze' : prediction[0][2], 'Total' : prediction[0][3]})
 
 
